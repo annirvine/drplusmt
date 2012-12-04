@@ -34,10 +34,12 @@ write me
 \subsection{Experiments}
 
 Table \ref{accresults} shows performance on the lexicon induction task. 
-The old contextual score uses a dictionary based on the intersection alignments over the training data for each language to project context vectors.
+The alignment dictionary score is the performance of the dictionary derived from the intersection alignments over the training data alone, which is used as supervision to both the old contextual scorer and the distributed representations learner.
+The fact that the accuracy using the alignment based dictionary alone is so low speaks to how noisy the alignments are and how limited the training data is.
+The old contextual score uses the same dictionary based on the intersection alignments over the training data for each language to project context vectors.
 The distributed representations use an interaction matrix defined also by the intersection alignments over the training data for each language.
 Both models use the same tokenization of all of the monolingual data that we have available for each language, which is taken from web crawls and Wikipedia.
-Evaluation is over {\it all} word types in the development set  for each language.
+Evaluation is over {\it all word types} in the development set  for each language.
 
 
 \begin{table}
@@ -48,18 +50,21 @@ Evaluation is over {\it all} word types in the development set  for each languag
 \hline
 \multicolumn{4}{|l|}{Tamil}  \\
 \hline
+Intersection Train Dict & 6.70 & 9.58 & 9.60 \\
 Old-Contextual & 2.32 & 8.38 & 25.44 \\ 
 Distrib Rep L2 Dist & 15.50 & 17.77 & 20.44 \\
 Distrib Rep Learn Dist & & & \\
 \hline
 \multicolumn{4}{|l|}{Bengali}  \\
 \hline
+Intersection Train Dict & 8.60 & 11.39 & 11.39 \\
 Old-Contextual & 3.91 & 12.39 & 30.53 \\
 Distrib Rep L2 Dist & 24.01 & 25.86 & 28.01 \\
 Distrib Rep Learn Dist & & & \\
 \hline
 \multicolumn{4}{|l|}{Hindi}  \\
 \hline
+Intersection Train Dict & 13.51 & 18.38 & 18.38 \\
 Old-Contextual & 5.22 & 14.72 & 34.31 \\
 Distrib Rep L2 Dist & 33.93 & 37.64 & 42.00 \\
 Distrib Rep Learn Dist & & & \\
