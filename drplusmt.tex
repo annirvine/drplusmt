@@ -8,7 +8,7 @@
 \usepackage{latexsym}
 \setlength\titlebox{6.5cm}    % Expanding the titlebox
 
-\title{Distributed Representations for Lexicon Induction}
+\title{Distributed Representations for Croos-lingual Lexicon Induction}
 
 %\author{Author 1\\
 %	  \And
@@ -23,15 +23,29 @@ write me
 \end{abstract}
 
 \section{Introduction}
+
+Motivate low-resource MT, cite our EACL work.\\
+
+Say that inducing translation lexicons is an important part. \\
+
+Say that the standard approach (starting tithe Rapp 95) uses vector space contextual similarity and a bilingual dictionary to project between languages. \\
+
+Say that there are two problems with those methods: (1) defining the feature representations and a   a metric to measure similarity is largely a heuristic task, (2) representations are quite large (on the order of vocal size).\\
+
+One alternative proposed in~\cite{Klementiev:2012} addresses these issues by inducing the \emph{same} embedding for words in both languages, so that words which are semantically similar are ``near'' one another in the induced representation.\\
+
+Say that we not only induce these representations, but also learn a metric in the new space specifically for lexicon induction.\\
+
+In this work, our goal is to investigate how well cross-lingual distributed representations can do on the lexicon induction task.  We compare it with a vector space contextual model which uses the same signals. \\
+
+\section{Background}
+
+Intro on distributed representation induction.
+
+\section{Additional Related Work}
 write me
 
-\section{Previous Work}
-write me
-
-\subsection{Model}
-write me
-
-\subsection{Experiments}
+\section{Experiments}
 
 Table \ref{accresults} shows performance on the lexicon induction task. 
 The alignment dictionary score is the performance of the dictionary derived from the intersection alignments over the training data alone, which is used as supervision to both the old contextual scorer and the distributed representations learner.
@@ -81,7 +95,7 @@ Distrib Rep Learn Dist & & & \\
 % python evalout.py ../dodoOutputs/111912outs/devdevtest.ta.epoch49 ../getAlignmentBasedDictionaries/growdiagfinaltranslations.plusbigall.ta ~/inducePhraseTable/LIMT/Experiments/IndianLangsCorpus/ta-en/dev.allwords dr tempoutput ta
 
 
-
+\section{Conclusions}
 
 
 \bibliographystyle{naaclhlt2013}
