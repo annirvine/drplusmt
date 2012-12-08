@@ -6,9 +6,55 @@
 \usepackage{naaclhlt2013}
 \usepackage{times}
 \usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{graphicx} 
+\usepackage[charter]{mathdesign}
+
+\usepackage{boxedminipage}  
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{enumitem}
+
+\usepackage{arydshln}
+\usepackage{tabularx}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newcommand{\mnote}[1]{\marginpar{%
+\vskip-\baselineskip
+\raggedright\footnotesize
+\itshape\hrule\smallskip\tiny{#1}\par\smallskip\hrule}}  
+\newcommand{\tab}{\hspace*{0.5em}}
+
+\newcommand{\mtodo}[1]{}
+%\newcommand{\mtodo}[1]{\mnote{\textcolor{red}{#1}}}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
+\newcommand{\todop}[2]{\noindent\textcolor{red}{TODO for #1:} #2\\}
+\newcommand{\todopi}[2]{[\textcolor{red}{TODO for #1:} #2]}
+\newcommand{\secref}[1]{Section~\ref{#1}}
+\newcommand{\tabref}[1]{Table~\ref{#1}}
+\newcommand{\figref}[1]{Figure~\ref{#1}}
+\newcommand{\formref}[1]{(\ref{#1})}
+\newcommand{\code}[1]{{\small \tt #1}}
+\newcommand{\emq}[1]{\emph{``#1''}}
+\newcommand{\paraheader}[1]{\vskip 0.05in \noindent\emph{#1}}
+\newcommand{\skipheader}{\vskip 0.05in}
+
+\def\aligns{\qopname\relax{no}{aligns}}
+
+\newcolumntype{C}[1]{>{\centering}m{#1}}
+
+\newcommand{\bm}{\boldsymbol}
+\def\bs#1{\boldsymbol{#1}}
+\newcommand{\itq}[1]{{\it ``#1''}}
+
 \setlength\titlebox{6.5cm}    % Expanding the titlebox
 
-\title{Distributed Representations for Croos-lingual Lexicon Induction}
+
+\title{Crosslingual Distributed Representations for Translation Lexicon Induction}
 
 %\author{Author 1\\
 %	  \And
@@ -19,33 +65,59 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-write me
+Using distributed representations of words instead of treating them as atomic units have been shown to alleviate data sparsity problems common to natural language processing tasks.  Their primary appeal is that they can be induced from cheap and plentiful unannotated data.  Recent work induces distributed representations for the crosslingual setting, in which some parallel data is also available, and makes them particularly relevant for low-resource machine translation.  In this work, we induce crosslingual distributed representations for a set of truly low resource languages and English, and use them for translation lexicon induction.  We demonstrate them to be dramatically more informative than the standard vector-space approach, which uses the same learning signals.
 \end{abstract}
 
-\section{Introduction}
+\section{Introduction} \label{sect:intro}
+Inducing translations lexicons from monolingual data has a long history in natural language processing literature~\cite{Rapp:1995;Fung:1998;Schafer:2002;Koehn:2002;Garera:2009}.  These techniques are usually motivated by their use in statistical machine translation, especially for low-resource languages where sufficient amounts of expensive parallel is unavailable, so that other resources must be used to induce and score word and phrase translations.  Recently, these techniques have been shown effective for the full phrase-base MT pipeline~\cite{koehn03phrasebased}, in which most of the parameters were estimated from monolingual data~\cite{eacl12} instead of bitexts.
 
-Motivate low-resource MT, cite our EACL work.\\
+Using distributed representations of words instead of treating them as atomic units have been shown to alleviate data sparsity problems common to natural language processing tasks.  Their primary appeal is that they can be induced from a large cheap unannotated corpus.  Recent work~\cite{Klementiev-et-al:COLING2012} proposes to induce distributed representations for the crosslingual setting, in which some parallel data is also available.  Semantically similar words in the induced embedding end up ``close'' to one another irrespective of the language.  This set-up is particularly relevant to a realistic low-resource machine translation set-up: along with plentiful monolingual data, small amounts of parallel data are also available or could be annotated cheaply~\cite{AnMTurkPaper}.
 
-Say that inducing translation lexicons is an important part. \\
+In this paper, we propose to use crosslingual distributed representations for translation lexicon induction for a truly low-resource translation setting.  First, we follow the setup of~\cite{Klementiev-et-al:COLING2012} and induce crosslingual embedding for English-Tamil, English-Bengali, and English-Hindi.  Unlike their experiments on English-German, our language pairs have relatively little available parallel data.  However, we show that that the induced representations are still informative for lexicon induction.  Next, we use a small set of translation pairs and induce a distance metric over the embedding specifically for lexicon induction.  Finally, we compare our results with a variant of the standard vector-space technique~\cite{Fung:1998}, which uses contextual information and a bilingual dictionary to induce translation lexicons.  While it makes use of the same set of signals as the distributed representation approach, it represents words with large (on the order of the vocabulary size) heuristically induced feature vectors.
 
-Say that the standard approach (starting tithe Rapp 95) uses vector space contextual similarity and a bilingual dictionary to project between languages. \\
+In sum, the main contributions of this work are:
 
-Say that there are two problems with those methods: (1) defining the feature representations and a   a metric to measure similarity is largely a heuristic task, (2) representations are quite large (on the order of vocal size).\\
+\begin{itemize}
+  \item We begin by inducing crosslingual distributed representations for three pairs of languages: English-Tamil, English-Bengali, and English-Hindi.  We follow the recent work of \cite{Klementiev-et-al:COLING2012}, however, our set-up is truly low resource: each pair has relatively small amount of parallel data.
+  \item We apply the induced for the task of translation lexicon induction.  With a small set of translations extracted from parallel data, we learn a metric over the induced embedding, and use it to select translations for a large vocabulary.
+  \item We experimentally demonstrate dramatic performance improvements over the standard vector-space based approach, which uses the same set of signals to induce translations.
+\end{itemize}
 
-One alternative proposed in~\cite{Klementiev:2012} addresses these issues by inducing the \emph{same} embedding for words in both languages, so that words which are semantically similar are ``near'' one another in the induced representation.\\
+\section{Crosslingual Distributed Representations} \label{sect:background}
 
-Say that we not only induce these representations, but also learn a metric in the new space specifically for lexicon induction.\\
+We begin with a brief overview of the cross-lingual distributed representation setup of~\cite{Klementiev-et-al:COLING2012}; we use features based on the these representations in our translation lexicon induction experiments in \secref{sect:experiemtns}. 
 
-In this work, our goal is to investigate how well cross-lingual distributed representations can do on the lexicon induction task.  We compare it with a vector space contextual model which uses the same signals. \\
+Their approach induces the \emph{same} embedding for words of both languages so that semantically similar words end up ``close'' to each other irrespective of the language.  They use large unannotated monolingual corpora to simultaneously induce representations for words within each language and parallel data to bring them together across languages.  The intuition for their approach to crosslingual representation induction comes from the multitask learning setup of~\cite{Cavallanti:2010}.  The goal of multitask learning (MTL) is to learn a set of related tasks jointly exploiting learning signals across the tasks.  In MTL terms, when inducing crosslingual representations, \cite{Klementiev-et-al:COLING2012} treat each word $w$ in languages'  vocabularies as an individual task.  Tasks related to $w$ are then defined as its possible translations in the other language.  They extract sets of related tasks and the ``degree of relatedness'' between them from co-occurrence statistics in a parallel corpus.
 
-\section{Background}
+They apply this set-up to a variant of neural probabilistic language model~\cite{Bengio:2003}.  Along with other model parameters $W$, these models learn a latent $d$-dimensional representation $c \in \mathbb{R}^{d|V|}$ of all words in a language vocabulary $V$ and use it to estimate conditional probabilities of the next word $w_t$ given $n$ words preceeding it in text $\hat{P}(w_t | w_{t-n+1:t-1})$.  An important property of the induced embedding $c$ is that it captures semantic and syntactic similarity of words in a language: similar words end up ``close'' to each other in $c$.  \cite{Klementiev-et-al:COLING2012} train two neural language models for a pair of languages jointly and use the MTL set-up to ensure that the similarity property holds across languages in the induced embedding $c$.  More formally, they optimize the following objective:
 
-Intro on distributed representation induction.
+\begin{eqnarray}
+ L(\theta^{(1,2)}) & = & \sum_{l=1}^{2} {\sum_{t = 1}^{T^{(l)}} \log \hat{P}_{\theta^{(l)}}(w^{(l)}_t | w^{(l)}_{t-n+1:t-1})} \nonumber \\
+ &&+ {1  \over 2} c^{\top} (A \otimes I_m) c, \nonumber
+ \end{eqnarray}
 
-\section{Additional Related Work}
-write me
+where $\theta^{(l)} = (W^{(l)}, c)$ include neural language model parameters $W^{(l)}$ as well as the shared  representation $c$, $\otimes$ is the Kronecker product and $I_m$ is the identity 
+matrix of size $m$.  
 
-\section{Experiments}
+The first summand is the log-likelihood of the texts $(w_1^{(l)}, w_2^{(l)}, \dots w_{T^{(l)}}^{(l)})$ of length $T^{(l)}$ for each language $l$.  This language modeling part of the objective ensures that embedding $c$ maps similar words close to one another within each language (see~\cite{Bengio:2003}).  The second part of the objective is the the MTL regularizer ensuring that the same property also holds across the two languages languages.  
+The interaction matrix $A$ encodes the degree of relatedness between words and their translations.   
+It is defined using word alignments in a parallel corpus: the more frequently a pair of words is aligned the better they fit as translations.
+
+The language models are leaned jointly from unannotated texts in both languages using stochastic gradient descent.  When an update is made for a representation of a word in one language, some of it is also propagated to the representations of all words related to it (i.e. it's translations).
+
+\cite{Klementiev-et-al:COLING2012} show that the induced embedding is very informative for crosslingual document classification, where a classifier trained with word representations as features on annotation available for one language we used in another languages directly.  
+
+In this work, we follow their setup and induce distributed crosslingual representations, learn a distance function over the embedding, and use it to select translation candidates. \todo{Separate into its own section?  And say more about how we do it.}
+
+\section{Additional Related Work} \label{sect:rework}
+
+\todo{Include Ryan's paper on direct annotation transfer: multilingual clusters for dependency parsing}
+
+\section{Experiments} \label{sect:experiemtns}
+
+\subsection{Vector-space Cntextual Baseline}
+
+\subsection{Results}
 
 Table \ref{accresults} shows performance on the lexicon induction task. 
 The alignment dictionary score is the performance of the dictionary derived from the intersection alignments over the training data alone, which is used as supervision to both the old contextual scorer and the distributed representations learner.
@@ -95,11 +167,9 @@ Distrib Rep Learn Dist & & & \\
 % python evalout.py ../dodoOutputs/111912outs/devdevtest.ta.epoch49 ../getAlignmentBasedDictionaries/growdiagfinaltranslations.plusbigall.ta ~/inducePhraseTable/LIMT/Experiments/IndianLangsCorpus/ta-en/dev.allwords dr tempoutput ta
 
 
-\section{Conclusions}
-
+\section{Conclusions} \label{sect:conclusions}
 
 \bibliographystyle{naaclhlt2013}
 \bibliography{bibfile}
-
 
 \end{document}
