@@ -144,7 +144,8 @@ This setting uses not only realistic seed bilingual dictionaries, but also a rea
 The test sets includes words of all parts of speech, words that appear in the training data as well as unknown words, and words that have both high and low monolingual frequencies.
 A lot of the prior work in bilingual lexicon induction only seeks to translate high frequency words \cite{something}, and, in some cases, only high frequency nouns \cite{koehn02,haghighi08}.
 
-We induce distributed representations and contextual vectors (see Section \ref{sec:contextbaseline}) using both web crawl and Wikipedia monolingual data for each language.
+We induce distributed representations and contextual vectors (see Section \ref{sec:contextbaseline}) using both web crawl and Wikipedia monolingual data as well as the training datasets for each language.
+For all languages, we subsample our English web crawl and Wikipedia data to roughly equal the amount of monolingual source language data.
 Table \ref{datastats} gives statistics about our datasets.
 In all experiments, we induce 80-dimensional distributed representations for each source and target language word.
 
