@@ -109,9 +109,9 @@ In all experiments, we induce 80-dimensional distributed representations for eac
 
 \section{Additional Related Work} \label{sect:rework}
 
-\newcite{tackstrom2012} uses similar techniques to induce crosslingual word clusters, which are used to inform parsers and named-entity recognizers. 
+\newcite{tackstrom2012} propose a related technique for inducing crosslingual word clusters, which they use for direct transfer of delexicalized parsers and named-entity recognizers. 
 That work also uses aligned parallel data to encourage crosslingual consistency over induced word representations.
-Although their induced clusters are informative for some downstream applications, we expect that they are not fine-grained enough for inducing translation pairs.
+Although their induced clusters are informative for some downstream applications, these representations commit to a particular clustering and thus do not handle multiple word senses, which  less applicable to lexicon induction.
 
 \section{Experiments} \label{sect:experiments}
 
