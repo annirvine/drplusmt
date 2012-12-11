@@ -44,32 +44,37 @@
 \maketitle
 \begin{abstract}
 Using distributed representations of words instead of treating them as atomic units has been shown to alleviate data sparsity problems common to natural language processing tasks.  
-Additionally, such representations can be induced from plentiful monolingual data.  
-Recently, \newcite{Klementiev-et-al:COLING2012} made use of parallel data to induce {\it crosslingual} distributed representations. %, suggesting their relevance for low-resource machine translation.  
+Unlike standard contextual vectors that represent words as vectors of counts of nearby words, distributed representations are low-dimensional representations of words that are induced iteratively using the distributed representations of nearby words.  
+Such representations can be induced from plentiful monolingual data.  
+Recently, \newcite{Klementiev-et-al:COLING2012} made use of parallel data to induce {\it crosslingual} distributed representations in which the embedding that defines the representations is learned jointly across languages. 
 We extend that work to induce crosslingual distributed representations for a set of low resource languages and English and use them for translation lexicon induction.  
 We demonstrate them to be dramatically more informative than the standard vector-space approach, which uses the same learning signals.
 \end{abstract}
 
 \section{Introduction} \label{sect:intro}
-Inducing translation lexicons from monolingual data has a long history in natural language processing literature~\cite{rapp95,fung98,schafer02,koehn02}.  These techniques are usually motivated by their use in statistical machine translation, especially for low-resource languages where large amounts of expensive parallel are unavailable.
+Inducing translation lexicons from monolingual data has a long history in natural language processing literature~\cite{rapp95,fung98,schafer02,koehn02}.  
+These techniques are usually motivated by their use in machine translation, especially for low-resource languages where suitable training data are hard to come by.
 In such cases, other resources must be used to induce and score word and phrase translations.  
-For example, \newcite{eacl12} used bilingual lexicon induction techniques to estimate most of the parameters of the full phrase-based MT pipeline \cite{koehn03phrasebased} from monolingual instead of parallel data.
+For example, \newcite{eacl12} used bilingual lexicon induction techniques to estimate most of the parameters of phrase-based MT \cite{koehn03phrasebased} from monolingual instead of parallel data.
 
-Using distributed representations of words instead of treating them as atomic units has been shown to alleviate data sparsity problems common to natural language processing tasks.  
-Additionally, they can be induced from cheap monolingual corpora.  
-Recent work~\cite{Klementiev-et-al:COLING2012} induces distributed representations for the crosslingual setting in which some parallel data is available in addition to monolingual corpora.  
-Semantically similar words end up ``close'' to one another in the induced embedding irrespective of language.  
+Using distributed representations of words instead of treating them as atomic units has been shown to alleviate data sparsity problems.  
+%Additionally, they can be induced from cheap monolingual corpora.  
+Low-dimensional distributed representations for words are learned not from nearby words themselves but from the distributed representations of nearby words.
+These representations are induced iteratively.
+Recently, \newcite{Klementiev-et-al:COLING2012} induced distributed representations for the crosslingual setting using parallel data in addition to large monolingual corpora.  
+There, the induced embedding is learned jointly over multiple languages so that 
+the representations of semantically similar words end up ``close'' to one another irrespective of language.  
 This setting is particularly relevant to low-resource machine translation, where, along with plentiful monolingual data, small amounts of parallel data are often available or could be created cheaply ~\cite{post2012}.
 
 In this paper, we propose to use crosslingual distributed representations for translation lexicon induction in a low-resource translation setting.  We follow the setup of \newcite{Klementiev-et-al:COLING2012} to induce crosslingual embeddings for English-Tamil, English-Bengali, and English-Hindi.  Unlike their English-German experiments, our language pairs have little available parallel data.  However, we show that that the induced representations are still informative for lexicon induction.  
 %Next, we use a small set of translation pairs and induce a distance metric over the embedding specifically for lexicon induction.  
-We compare our results with a variant of the standard vector-space technique~\cite{fung98}, which uses contextual information and a bilingual dictionary to induce translation lexicons.  
-While it makes use of the same signals as the distributed representation approach, it represents words with large (on the order of the vocabulary size) heuristically induced feature vectors.
+We compare our results with a variant of the standard vector-space projection technique~\cite{fung98}, which uses contextual information and a bilingual dictionary to induce translation lexicons.  
+While it makes use of the same signals as the distributed representation approach, it represents words with large (on the order of the vocabulary size) feature vectors.
 
 In sum, the main contributions of this work are:
 
 \begin{itemize}
-  \item We induce crosslingual distributed representations for three low-resource language pairs: English-Tamil, English-Bengali, and English-Hindi.  We follow the recent work of \newcite{Klementiev-et-al:COLING2012}, however, in our setting, we only have small amounts of parallel data. We use the representations to select English translations for source language words.
+  \item We induce crosslingual distributed representations for three low-resource language pairs: English-Tamil, English-Bengali, and English-Hindi.  %We follow the recent work of \newcite{Klementiev-et-al:COLING2012}, however, in our setting, we only have small amounts of parallel data. We use the representations to select English translations for source language words.
 %  \item We use the induced representations for the task of translation lexicon induction.  With a small set of translations extracted from parallel data, we learn a metric over the induced embedding, and use it to select translations for a large vocabulary.
   \item We experimentally demonstrate dramatic performance improvements over the standard vector-space based approach, which uses the same signals to induce translations.
 \end{itemize}
@@ -102,7 +107,7 @@ It is defined using word alignments in a parallel corpus: the more frequently a 
 
 The language models are leaned jointly from monolingual texts in each language using stochastic gradient descent.  When an update is made for a representation of a word in one language, some of it is also propagated to the representations of all words related to it (i.e. it's translations).
 
-\newcite{Klementiev-et-al:COLING2012} show that the induced embedding is informative for crosslingual document classification, where the classifier is trained with word representations as features.
+\newcite{Klementiev-et-al:COLING2012} show that the induced embedding is informative for crosslingual document classification, where the classifier uses word representations as features.
 In this work, we follow their setup to induce distributed crosslingual representations. %We then use them to rank English translation candidates for source language words.
 In all experiments, we induce 80-dimensional distributed representations for each source and target language word and use Euclidean distance to rank English words for each source language word in our test set.
 
@@ -111,7 +116,7 @@ In all experiments, we induce 80-dimensional distributed representations for eac
 
 \newcite{tackstrom2012} propose a related technique for inducing crosslingual word clusters, which they use for direct transfer of delexicalized parsers and named-entity recognizers. 
 That work also uses aligned parallel data to encourage crosslingual consistency over induced word representations.
-Although their induced clusters are informative for some downstream applications, these representations commit to a particular clustering and thus do not handle multiple word senses, which  less applicable to lexicon induction.
+Although their induced clusters are informative for these downstream applications, these representations commit to a particular clustering and thus do not handle multiple word senses, which less applicable to lexicon induction.
 
 \section{Experiments} \label{sect:experiments}
 
@@ -140,13 +145,14 @@ OOV Rate & 44\% & 37\% & 34\% \\
 \hline
 \end{tabular}
 \end{center}
+\vspace{-.45cm}
 \caption{Dataset statistics for each language. Monolingual gives the millions of monolingual word tokens that we use to induce distributed word representations and baseline contextual vectors for each language. Training data gives the number of thousand of words in the source language training set released by \newcite{post2012}. OOV rates give the percent of development set word types (our test set for bilingual lexicon induction) that do not appear in the training data.}\label{datastats}
-\vspace{-.35cm}
+\vspace{-.45cm}
 \end{table}
 
 \subsection{Data}
 
-\newcite{post2012} used Amazon's Mechanical Turk to collect small parallel datasets for several low resource Indian languages. 
+\newcite{post2012} used crowdsourcing to collect small parallel datasets for several low resource Indian languages. 
 We use those datasets in our experiments here in order to test our models in a realistic low resource machine translation setting.
 In particular, we use automatic intersection alignments over the training datasets to inform both the baseline and our proposed model. %derive seed bilingual dictionaries. %, which both the vector-space contextual baseline and our model for learning distributed word representations utilize.
 The contextual baseline uses a seed bilingual dictionary based on the aligned training data to project context vectors (see Section \ref{sec:contextbaseline}), and the distributed representations learner uses them to define the interaction matrix A (see Section \ref{sect:background}).
@@ -166,8 +172,8 @@ The seed bilingual dictionary is based on word alignments, so it is likely to be
 In a real MT setting, a grammar extracted from the same aligned data would be similarly noisy and incomplete, and, thus, we may want to induce translations for all words, even if they appear in the training data.
 We hope that our induced translations will preserve the correct translation pairs in the seed dictionary, forget the incorrect pairs, and induce good translations for additional words.
 
-We use the translations derived by automatically aligning our development sets in order to evaluate our induced translations.
-Because our datasets are small and the alignments over them are sparse and noisy, we supplement the alignments-based dictionaries with existing digital bilingual dictionaries for each language in order to improve the coverage of our gold standard dictionary.
+We use the translations derived by automatically aligning our development sets to evaluate our induced translations.
+Because our datasets are small and the alignments over them are sparse and noisy, we supplement the alignments-based dictionaries with existing electronic bilingual dictionaries for each language in order to improve the coverage of our gold standard dictionary.
 % Note these dictionaries include David's ocr'd dictionaries as well as the MTurk dictionaries that Dimitri gathered
 
 \subsection{Results}
@@ -200,14 +206,14 @@ In the context of phrase based MT, that would mean smaller and more accurate phr
 \hline
 \multicolumn{4}{|l|}{Tamil}  \\
 \hline
-Seed dict baseline & 6.70 & 9.58 & 9.60 \\
+Align-based dict & 6.70 & 9.58 & 9.60 \\
 Context baseline & 2.32 & 8.38 & {\bf 25.44} \\ 
 Distrib Rep L2 Dist & {\bf 15.50} & {\bf 17.77} & 20.44 \\
 %Distrib Rep Learn Dist & & & \\
 \hline
 \multicolumn{4}{|l|}{Bengali}  \\
 \hline
-Seed dict baseline & 8.60 & 11.39 & 11.39 \\
+Align-based dict & 8.60 & 11.39 & 11.39 \\
 Context baseline & 3.91 & 12.39 & {\bf 30.53} \\
 %DR L2 Dist - Dim-40 & 19.64 & 22.14 & 24.84 \\
 Distrib Rep L2 Dist & {\bf 24.01} & {\bf 25.86} & 28.01 \\
@@ -216,14 +222,14 @@ Distrib Rep L2 Dist & {\bf 24.01} & {\bf 25.86} & 28.01 \\
 \hline
 \multicolumn{4}{|l|}{Hindi}  \\
 \hline
-Seed dict baseline & 13.51 & 18.38 & 18.38 \\
+Align-based dict & 13.51 & 18.38 & 18.38 \\
 Context baseline & 5.22 & 14.72 & 34.31 \\
 Distrib Rep L2 Dist & {\bf 33.93} & {\bf 37.64} & {\bf 42.00} \\
 %Distrib Rep Learn Dist & & & \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Comparison of performance of old definition of contextual similarity with new distributed representations model}\label{accresults}
+\caption{Accuracy of standard contextual similarity vs new distributed representations model}\label{accresults}
 \vspace{-.35cm}
 \end{table}
 
